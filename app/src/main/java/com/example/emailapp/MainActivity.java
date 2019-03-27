@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +22,10 @@ public class MainActivity extends AppCompatActivity {
     public void newMessage(View view) {
         Intent intent = new Intent(this, NewMessageActivity.class);
         startActivity(intent);
+    }
+
+    public void displayMessage(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
     @Override

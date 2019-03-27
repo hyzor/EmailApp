@@ -1,7 +1,5 @@
 package com.example.emailapp;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +14,14 @@ public class NewMessageActivity extends AppCompatActivity {
         setContentView(R.layout.activity_new_message);
     }
 
+    public void displayMessage(final String message) {
+        this.runOnUiThread(new Runnable() {
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     public void sendMessage(View view) {
         EditText recipientText = findViewById(R.id.recipientText);
         EditText subjectText = findViewById(R.id.subjectText);
@@ -24,20 +30,16 @@ public class NewMessageActivity extends AppCompatActivity {
         String recipient = recipientText.getText().toString();
         String subject = subjectText.getText().toString();
         String message = messageText.getText().toString();
+        String from = "hyzore@gmail.com";
+        String pass = "fbX#UmA1!B2g%E8E";
 
-        Intent email = new Intent(Intent.ACTION_SEND);
-        email.putExtra(Intent.EXTRA_EMAIL, new String[] { recipient });
-        email.putExtra(Intent.EXTRA_SUBJECT, subject);
-        email.putExtra(Intent.EXTRA_TEXT, message);
-        email.setType("message/rfc822");
+        Mail mail = new Mail(from, pass);
+        mail.set_from(from);
+        mail.setBody(message);
+        mail.set_to(new String[] { recipient });
+        mail.set_subject(subject);
 
-        try {
-            startActivity(Intent.createChooser(email, "Choose e-mail client"));
-            setResult(Activity.RESULT_OK, email);
-            finish();
-            Toast.makeText(getApplicationContext(), "Message sent!", Toast.LENGTH_SHORT).show();
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(getApplicationContext(), "No e-mail client found!", Toast.LENGTH_SHORT).show();
-        }
+        SendEmailThread email = new SendEmailThread(mail, this);
+        email.start();
     }
 }
