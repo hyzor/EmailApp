@@ -1,14 +1,15 @@
 package com.example.emailapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.api.client.extensions.android.http.AndroidHttp;
-import com.google.api.client.http.HttpTransport;
+import com.firebase.ui.auth.util.ExtraConstants;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -16,12 +17,17 @@ import javax.mail.internet.MimeMessage;
 public class NewMessageActivity extends AppCompatActivity {
     private Intent intent;
 
+    @NonNull
+    public static Intent createIntent(@NonNull Context context, @NonNull String email) {
+        return new Intent().setClass(context, NewMessageActivity.class)
+                .putExtra(ExtraConstants.EMAIL, email);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_message);
         intent = getIntent();
-        HttpTransport transport = AndroidHttp.newCompatibleTransport();
     }
 
     public void displayMessage(final String message) {
@@ -41,9 +47,9 @@ public class NewMessageActivity extends AppCompatActivity {
         String subject = subjectText.getText().toString();
         String message = messageText.getText().toString();
 
-        String from = intent.getStringExtra("EMAIL");
+        String from = intent.getStringExtra(ExtraConstants.EMAIL);
 
-        MailHandler mailHandler = new MailHandler(MainActivity.getGmailService());
+        MailHandler mailHandler = new MailHandler(SignedInActivity.getGmailService());
         MimeMessage mimeMessage = mailHandler.createEmail(recipient, from, subject, message);
 
         SendEmailThread email = new SendEmailThread(mailHandler, this, mimeMessage, "me");
